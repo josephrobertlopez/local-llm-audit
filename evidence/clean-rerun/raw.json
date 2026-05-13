@@ -1,0 +1,203 @@
+[
+  {
+    "task_id": "H-001",
+    "rep": 0,
+    "latency_s": 232.59090185165405,
+    "score": 0.0,
+    "content_chars": 9663,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "code",
+      "reasoning_fast",
+      "verification"
+    ],
+    "trace_backends": [
+      "kronos-qwen-32b",
+      "claude-haiku",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-001",
+    "rep": 1,
+    "latency_s": 194.25291872024536,
+    "score": 0.0,
+    "content_chars": 8829,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "code",
+      "reasoning_fast",
+      "code"
+    ],
+    "trace_backends": [
+      "kronos-qwen-32b",
+      "claude-haiku",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-001",
+    "rep": 2,
+    "latency_s": 114.36557698249817,
+    "score": 0.0,
+    "content_chars": 3202,
+    "trace_n_subtasks": 2,
+    "trace_subtask_intents": [
+      "code",
+      "code"
+    ],
+    "trace_backends": [
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-002",
+    "rep": 0,
+    "latency_s": 185.2534375190735,
+    "score": 1.0,
+    "content_chars": 7689,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "reasoning_hard",
+      "code",
+      "verification"
+    ],
+    "trace_backends": [
+      "kronos-qwq-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-002",
+    "rep": 1,
+    "latency_s": 190.80064129829407,
+    "score": 1.0,
+    "content_chars": 7774,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "reasoning_hard",
+      "code",
+      "verification"
+    ],
+    "trace_backends": [
+      "kronos-qwq-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-002",
+    "rep": 2,
+    "latency_s": 500.73539638519287,
+    "score": 1.0,
+    "content_chars": 23215,
+    "trace_n_subtasks": 4,
+    "trace_subtask_intents": [
+      "reasoning_fast",
+      "code",
+      "code",
+      "verification"
+    ],
+    "trace_backends": [
+      "claude-haiku",
+      "claude-haiku",
+      "kronos-qwq-32b",
+      "claude-haiku",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-003",
+    "rep": 0,
+    "latency_s": 364.41074681282043,
+    "score": 1.0,
+    "content_chars": 17242,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "reasoning_fast",
+      "reasoning_hard",
+      "reasoning_hard"
+    ],
+    "trace_backends": [
+      "claude-haiku",
+      "kronos-qwq-32b",
+      "kronos-qwq-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-003",
+    "rep": 1,
+    "latency_s": 407.1954836845398,
+    "score": 1.0,
+    "content_chars": 18252,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "reasoning_fast",
+      "reasoning_hard",
+      "reasoning_hard"
+    ],
+    "trace_backends": [
+      "claude-haiku",
+      "kronos-qwq-32b",
+      "kronos-qwq-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  },
+  {
+    "task_id": "H-003",
+    "rep": 2,
+    "latency_s": 372.83550238609314,
+    "score": 1.0,
+    "content_chars": 18081,
+    "trace_n_subtasks": 3,
+    "trace_subtask_intents": [
+      "reasoning_fast",
+      "reasoning_hard",
+      "reasoning_fast"
+    ],
+    "trace_backends": [
+      "claude-haiku",
+      "kronos-qwq-32b",
+      "claude-haiku",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b",
+      "kronos-qwen-32b"
+    ],
+    "real_decomposition": true,
+    "http_status": 200
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "H-001": {
+    "n_real_decomp": 3,
+    "n_correct": 0,
+    "mean_latency_s": 180.40313251813254,
+    "stddev_latency_s": 60.317238775391054
+  },
+  "H-002": {
+    "n_real_decomp": 3,
+    "n_correct": 3,
+    "mean_latency_s": 292.26315840085346,
+    "stddev_latency_s": 180.5635577160888
+  },
+  "H-003": {
+    "n_real_decomp": 3,
+    "n_correct": 3,
+    "mean_latency_s": 381.4805776278178,
+    "stddev_latency_s": 22.66465137051254
+  }
+}

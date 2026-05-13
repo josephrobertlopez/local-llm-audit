@@ -1,0 +1,136 @@
+Okay, let's tackle this problem step by step. The question has four parts, so I'll go through each one carefully.
+
+Starting with part (a): Explain the closed-form or growth rate of the recurrence relation f(n) = f(n-1) + 2*f(n-2), with initial conditions f(1)=1 and f(2)=1. 
+
+Hmm, right, for linear recurrences like this, the standard approach is to find the characteristic equation. Let me recall how that works. For a recurrence relation of the form f(n) = a*f(n-1) + b*f(n-2), the characteristic equation is r² - a*r - b = 0. The roots of this equation determine the closed-form solution. 
+
+In this case, the coefficients are a=1 and b=2. So the characteristic equation should be r² - r - 2 = 0. Let me solve that quadratic equation. Using the quadratic formula: r = [1 ± sqrt(1 + 8)] / 2 = [1 ± 3]/2. That gives roots at (1+3)/2 = 2 and (1-3)/2 = -1. 
+
+So the roots are 2 and -1. Therefore, the general solution is f(n) = C*(2)^n + D*(-1)^n. Now we need to use the initial conditions to find constants C and D. 
+
+Let's plug in n=1: f(1)=1 = C*2^1 + D*(-1)^1 → 2C - D = 1.
+
+For n=2: f(2)=1 = C*2^2 + D*(-1)^2 → 4C + D = 1.
+
+Now we have two equations:
+1) 2C - D = 1
+2) 4C + D = 1
+
+Adding both equations to eliminate D: 6C = 2 → C = 1/3.
+
+Substituting back into equation 1: 2*(1/3) - D =1 → 2/3 - D =1 → D = 2/3 -1 = -1/3.
+
+Therefore, the closed-form expression is f(n) = (1/3)(2^n) + (-1/3)(-1)^n. Simplifying the second term: since (-1)^n multiplied by -1/3 becomes ( (-1)^{n+1} ) /3. Alternatively, maybe it's better written as (2^n - (-1)^n)/3? Let me check:
+
+Wait, substituting C and D:
+
+f(n) = (1/3)*2^n + (-1/3)*(-1)^n = (2^n + (-1)^{n+1}) /3. Hmm, perhaps another way. Let me see:
+
+Alternatively, factor out 1/3:
+
+(2^n - (-1)^n)/3. Wait, because (-1)^{n} times -1 is (-1)^{n+1}, but maybe I can write it as (2^n - (-1)^n)/3. Let me check with n=1:
+
+(2^1 - (-1)^1)/3 = (2 +1)/3 = 3/3 =1, which matches f(1)=1. For n=2: (4 -1)/3 = 3/3=1, also correct. So yes, the closed-form is f(n) = (2^n - (-1)^n)/3.
+
+Now, for the growth rate. Since the closed-form has terms 2^n and (-1)^n. The term with 2^n grows exponentially, while the (-1)^n term oscillates between 1 and -1 but doesn't grow. So as n becomes large, the dominant term is (2^n)/3. Therefore, the growth rate is O(2^n). So the sequence grows exponentially at a rate proportional to 2^n. 
+
+Moving on to part (b): Implement a Python function f(n) iteratively. 
+
+An iterative approach would avoid recursion and instead compute the values step by step up to n. Since the recurrence depends on the previous two terms, we can store those two variables and update them each time. 
+
+Let me think of the steps. For n=1 or 2, return 1. For n>2, start with a and b representing f(1) and f(2). Then loop from 3 to n, each time computing next_val = a + 2*b, then shift the variables: set a = b, b = next_val. At the end, return b. 
+
+Wait, let me make sure the indices are right. Let's see:
+
+Initialize:
+
+If n ==1: return 1
+
+elif n==2: return 1
+
+else:
+
+    a = f(1) =1, b = f(2)=1
+
+    for i from 3 to n:
+
+        next_val = b + 2*a ?
+
+Wait wait, hold on! The recurrence is f(n) = f(n-1) + 2*f(n-2). So when moving forward, if current a is f(n-2) and b is f(n-1), then next_val = b + 2*a. 
+
+Yes. Because f(n) = f(n-1) + 2*f(n-2) → using the previous two terms. 
+
+So after calculating next_val, we need to update a and b. The new a becomes the old b (since it's now the term before the next one), and the new b is next_val. 
+
+So the loop would proceed correctly. 
+
+Testing with small n:
+
+For n=3: next_val =1 + 2*1 =3 → returns 3. Which is correct?
+
+Wait let's compute manually:
+
+f(3) = f(2)+2*f(1) =1 +2*1=3 ✔️
+
+f(4)=f(3)+2*f(2)=3+2*1=5?
+
+Wait wait, no. Wait f(4)= f(3) + 2*f(2) → 3 + 2*1 =5. But according to the closed-form, f(4) would be (2^4 - (-1)^4)/3 → (16-1)/3=15/3=5. Correct. 
+
+Another test: f(5)= f(4)+2*f(3)=5 +2*3=11. Closed-form: (32 - (-1)^5)/3 → (32 +1)/3=33/3=11. Good. 
+
+So the iterative approach should work. 
+
+The Python code would look something like this:
+
+def f(n):
+    if n <1:
+        raise ValueError("n must be at least 1")
+    if n ==1 or n ==2:
+        return 1
+    a, b = 1, 1  # a = f(n-2), b = f(n-1)
+    for _ in range(3, n+1):
+        next_val = b + 2*a
+        a, b = b, next_val
+    return b
+
+That should do it. Let me test for n=3, returns 3; n=4 gives 5, etc. 
+
+Part (c): Verify that f(10)=341. 
+
+Using the iterative function, let's compute step by step. Let me compute f(1) through f(10):
+
+f(1)=1
+
+f(2)=1
+
+f(3)=1 +2*1=3
+
+f(4)=3 +2*1=5
+
+f(5)=5 +2*3=5+6=11
+
+f(6)=11 +2*5=11+10=21
+
+f(7)=21 +2*11=21+22=43
+
+f(8)=43 +2*21=43+42=85
+
+f(9)=85 +2*43=85+86=171
+
+f(10)=171 +2*85 =171+170=341. Yes! So that checks out. Alternatively, using the closed-form:
+
+f(10) = (2^10 - (-1)^10)/3 = (1024 -1)/3 = 1023/3 = 341. Perfect. 
+
+So part (c) is confirmed. 
+
+Part (d): Implement a helper that confirms f(n) grows roughly geometrically. 
+
+A geometric growth means that f(n) ≈ k * r^n for some constants k and r. Here, we know from the closed-form that the dominant term is (2^n)/3, so the growth rate should be approximately 2^n. To confirm this, the helper could compute the ratio f(n)/f(n-1) and show that it approaches 2 as n increases. 
+
+Alternatively, for each n, compute the ratio and see if it converges to 2. 
+
+The helper function might take n as input and return the ratio f(n)/f(n-1), or perhaps compute these ratios for a range of n and show they approach 2. 
+
+Alternatively, to create a helper that, given n, calculates the ratio and shows it's close to 2. 
+
+Alternatively, the

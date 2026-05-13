@@ -1,0 +1,113 @@
+Okay, let's tackle this problem step by step. First, I need to handle part (a), explaining the closed-form or growth rate of the recurrence relation given. The recurrence is f(n) = f(n-1) + 2*f(n-2) with initial conditions f(1)=1 and f(2)=1. 
+
+Starting with part (a), I remember that linear recurrences like this can be solved using characteristic equations. The standard approach is to assume a solution of the form r^n, plug it into the recurrence, and solve for r. Let me try that.
+
+So substituting f(n) = r^n into the equation gives:
+r^n = r^(n-1) + 2*r^(n-2)
+Divide both sides by r^(n-2) to simplify:
+r^2 = r + 2
+That gives the characteristic equation r² - r - 2 = 0. Solving this quadratic equation, the roots would be [1 ± sqrt(1 + 8)] / 2 since the discriminant is b² - 4ac = 1 + 8 =9. So sqrt(9)=3. Therefore, the roots are (1+3)/2=2 and (1-3)/2=-1. 
+
+So the general solution should be f(n) = A*(2)^n + B*(-1)^n, where A and B are constants determined by the initial conditions. Now applying the initial conditions to find A and B.
+
+For n=1: f(1)=1 = A*2 + B*(-1)
+For n=2: f(2)=1 = A*4 + B*(1)
+
+So setting up the equations:
+Equation 1: 2A - B = 1
+Equation 2: 4A + B = 1
+
+Let me add these two equations to eliminate B. Adding equation1 and equation2:
+
+2A - B + 4A + B = 1 +1 → 6A = 2 → A = 2/6 = 1/3 ≈ 0.333...
+
+Then substitute back to find B. Using equation1: 2*(1/3) - B =1 → 2/3 - B =1 → -B =1 - 2/3 =1/3 → B = -1/3.
+
+Therefore, the closed-form formula is f(n) = (1/3)(2)^n + (-1/3)(-1)^n. 
+
+Simplifying the second term: (-1/3)*(-1)^n = (1/3)(-1)^{n+1}. But maybe better left as is. Anyway, the dominant term here is the (2)^n term because 2 is larger than |-1|. As n grows, the (-1)^n term becomes negligible compared to 2^n. So the growth rate is O(2^n). That answers part (a)'s explanation about the growth rate being exponential, specifically dominated by the root 2, so the growth rate is proportional to 2^n.
+
+Moving on to part (b): Implementing an iterative Python function for f(n). Since the recurrence is linear and only depends on the previous two terms, we can compute it iteratively without recursion. Let's think of how to do that.
+
+The base cases are f(1)=1 and f(2)=1. For n >=3, each term is the sum of the previous term plus twice the one before that. So starting from n=3 upwards, we can loop up to n, keeping track of the last two values.
+
+Let me outline the steps for the function:
+
+Initialize variables a and b as f(1) and f(2). If n is 1 or 2, return 1 immediately. Otherwise, loop from 3 to n. In each iteration, compute the next term as b + 2*a. Then update a to be the previous b, and b to be the new value. After the loop, return b.
+
+Wait, let me check with an example. Let's say n=3:
+
+Start with a=1 (f(1)), b=1 (f(2)). Next term is b + 2a =1 +2*1=3. So f(3)=3. Then a becomes 1 (old b), and b becomes 3. For n=4, next term is 3 + 2*1=5? Wait wait, no, hold on. Wait, f(3)=3, then f(4)=f(3)+2*f(2)=3 +2*1=5. Yes. Then f(4)=5. Then f(5)=5 +2*3=11. Hmm, but let me see if the code would do that correctly.
+
+Alternatively, perhaps I should structure the loop such that for each step, we compute the next value based on the current a and b, then shift the variables forward. Let me code this mentally.
+
+Function f(n):
+
+if n ==1 or n==2: return 1
+
+else:
+
+    a, b = 1,1
+
+    for i in range(3, n+1):
+
+        next_val = b + 2*a
+
+        a = b
+
+        b = next_val
+
+    return b
+
+Yes, that seems right. Let's test for n=3, returns 3. n=4: 5, n=5: 5+2*3=11, etc. That should work.
+
+Now part (c): Verify that f(10)=341. Let's compute f(10) using the iterative approach to confirm.
+
+Let me compute step by step manually up to n=10:
+
+n1:1, n2:1,
+
+n3:1+2*1=3 →3
+
+n4:3+2*1=5 →5
+
+n5:5+2*3=5+6=11 →11
+
+n6:11 + 2*5=11+10=21 →21
+
+n7:21 +2*11=21+22=43 →43
+
+n8:43 +2*21=43+42=85 →85
+
+n9:85 +2*43=85+86=171 →171
+
+n10:171 +2*85=171 +170 = 341 → yes! So f(10)=341. That checks out.
+
+Part (d) requires implementing a helper function that confirms f(n) grows roughly geometrically. Since the closed-form has a dominant term of 2^n, the ratio between successive terms should approach 2 as n increases. Alternatively, the ratio f(n)/f(n-1) should approach 2. So the helper could compute the ratio for some n and show it's close to 2. Or perhaps compute the ratio over several terms and see they trend towards 2.
+
+Alternatively, the problem might want a function that, given n, returns the ratio f(n)/f(n-1), and shows that it approaches 2 as n increases. To confirm that the growth is geometric with ratio ~2, the helper could compute this ratio for a given n and see it's near 2.
+
+Another approach is to compute the logarithm of f(n) and see if it's approximately linear with slope log(2). But maybe the simplest helper is to compute the ratio f(n)/f(n-1) for a given n and see it's approaching 2.
+
+Let me think of the helper function. It could take n as input and return the ratio. For example, if n is 10, then f(10)=341, f(9)=171. 341/171 ≈ 1.994, which is close to 2. Similarly, for higher n, the ratio gets closer. So the helper function can be written as:
+
+def growth_ratio(n):
+    if n <2:
+        raise ValueError("n must be at least 2")
+    a, b = 1,1
+    for i in range(3, n+1):
+        next_val = b + 2*a
+        a = b
+        b = next_val
+    return b / a
+
+Testing this for n=10 gives 341/171 ≈1.994, which is very close to 2. For n=20, the ratio would be even closer. This demonstrates the geometric growth with ratio approaching 2.
+
+Alternatively, the helper could compute the ratio over multiple terms and show the trend. But the problem says "confirm f(n) grows roughly geometrically", so showing the ratio approaches 2 is sufficient.
+
+Putting all together, the steps are clear. Now, time to write the answers properly.
+</think>
+
+(a) The recurrence has characteristic equation \( r^2 - r - 2 = 0 \), with roots \( r = 2 \) and \( r = -1 \). The closed-form is \( f(n) = \frac{1}{3}(2^n) + \frac{-1}{3}(-1)^n \). The dominant term \( 2^n \) dictates the growth rate, so \( f(n) \) grows exponentially as \( \Theta(2^n) \).
+
+(b) Iterative Python

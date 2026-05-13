@@ -1,0 +1,160 @@
+## reasoning_hard
+Okay, so I need to figure out why the formula 5! minus 2 times 4! gives the number of arrangements of 5 distinct books where books A and B are not adjacent. Hmm, let's start by recalling some basics about permutations and restrictions.
+
+First, the total number of ways to arrange 5 distinct books without any restrictions is indeed 5 factorial, which is 5! = 120. That part makes sense because for each position, you have one fewer book to place, so 5×4×3×2×1.
+
+Now, the problem wants arrangements where A and B are not next to each other. The formula given subtracts 2×4! from 5!. So maybe they're subtracting the number of arrangements where A and B are adjacent? Let me check that.
+
+If we want to find the number of arrangements where A and B are adjacent, we can treat them as a single unit or "block." So instead of having 5 separate books, we now have this AB block plus the other 3 books, making a total of 4 items to arrange. The number of ways to arrange these 4 items is 4!.
+
+But wait, within the AB block, A and B can be in two different orders: AB or BA. So we have to multiply by 2 to account for both possibilities. Therefore, the total number of arrangements where A and B are adjacent is 2×4!.
+
+Therefore, to get the number of arrangements where they are not adjacent, we subtract that from the total number of arrangements. So it should be 5! - 2×4!.
+
+Let me verify this with an example. Suppose the books are A, B, C, D, E. Let's compute both terms:
+
+5! = 120
+
+2×4! = 2×24 = 48
+
+So 120 - 48 = 72. Is that correct?
+
+Alternatively, maybe I can count manually for a smaller case to see if the method works. Let's try with 3 books: A, B, C. How many arrangements where A and B are not adjacent?
+
+Total arrangements: 3! = 6.
+
+Number of arrangements where A and B are adjacent: Treat AB as a block, so 2 items: [AB], C. These can be arranged in 2! ways, and multiplied by 2 (for BA). So 2×2=4. Wait, but actually, when n=3, treating AB as a block gives 2 items, so 2! arrangements, times 2 for AB/BA, so 2×2=4. Then subtracting from 6 gives 2. Let's list them:
+
+All permutations:
+
+1. ABC – A and B adjacent
+2. ACB – not adjacent
+3. BAC – adjacent
+4. BCA – not adjacent
+5. CAB – not adjacent
+6. CBA – adjacent
+
+Wait, hold on. The ones where A and B are not adjacent are ACB, BCA, CAB. That's three, but according to the formula 3! - 2×2! = 6 - 4 = 2. Hmm, discrepancy here. Wait, so maybe my initial reasoning was wrong?
+
+Wait, in the case of 3 books, the number of adjacent arrangements should be calculated correctly. Let me recalculate:
+
+When considering A and B as adjacent, the blocks would be AB or BA. For 3 books, the blocks would make 2 elements (the AB/BA block and the third book). So arranging those two elements: 2! ways. Each block has 2 internal arrangements. So total adjacent arrangements: 2! * 2 = 4. But in reality, how many are there?
+
+Looking at the list above, the adjacent ones are ABC, BAC, BCA (wait no), wait let's see:
+
+Wait in permutation 1: ABC – A and B are adjacent (positions 1-2)
+
+Permutation 3: BAC – B and A adjacent (positions 1-2)
+
+Permutation 6: CBA – B and A adjacent (positions 2-3)
+
+Wait permutation 4: BCA – B is first, then C, then A. So B and A are separated by C, so not adjacent.
+
+Similarly permutation 5: CAB – C first, then A, then B. A and B are adjacent here (positions 2-3). Wait, CAB has A and B adjacent? Yes, positions 2 and 3. So CAB is adjacent?
+
+Wait hold on, CAB: positions are C (1), A (2), B (3). So A is at 2, B at 3, so they are adjacent. So that's another one. Wait so actually, in the list above, the adjacent ones are:
+
+1. ABC (A-B adjacent)
+
+3. BAC (B-A adjacent)
+
+5. CAB (A-B adjacent)
+
+6. CBA (B-A adjacent)
+
+That's four arrangements where A and B are adjacent. So the formula gives 4, which matches. Then the non-adjacent ones are 2: ACB and BCA? Wait no, ACB is position 1: A, 2:C, 3:B. So A and B are separated by C, so not adjacent. BCA is B, C, A – same, separated by C. So that's two. Wait but CAB was adjacent? Wait CAB is C, A, B. So A and B are adjacent here. So yes, the non-adjacent ones are ACB, BCA, and... wait, no, that's only two? Wait no, let's recount all permutations:
+
+1. ABC – adjacent
+
+2. ACB – not
+
+3. BAC – adjacent
+
+4. BCA – not
+
+5. CAB – adjacent
+
+6. CBA – adjacent
+
+So non-adjacent are 2, 4. So two. Which matches 3! - 2×2! = 6-4=2. So that works. My mistake earlier was thinking CAB wasn't adjacent, but it is. So the formula works here.
+
+Therefore going back to the original problem with 5 books, the formula should be correct. Let me confirm again:
+
+Total arrangements: 5! = 120.
+
+Adjacent arrangements: 2×4! = 48. So 120 - 48 = 72. To be thorough, maybe think of another way to calculate non-adjacent arrangements.
+
+Alternatively, we can use the inclusion-exclusion principle. The total number without restrictions minus the number with A and B adjacent. Since adjacency is the only restriction, that's exactly what the formula does.
+
+Another approach: For non-adjacent arrangements, we can first arrange the other books and then insert A and B into the gaps. Let's see if that gives the same result.
+
+Suppose we have 5 books: A, B, C, D, E. If we want A and B not adjacent, first arrange the other 3 books (C, D, E). There are 3! = 6 ways. Once arranged, say as C D E, there are spaces where we can insert A and B. The possible slots are:
+
+_ C _ D _ E _
+
+So 4 slots (the underscores). We need to choose 2 distinct slots out of these 4 to place A and B. The number of ways is P(4,2) = 4×3 = 12. Since A and B are distinct, order matters. So total arrangements would be 3! × 4 × 3 = 6×12 = 72. Which matches the previous result. 
+
+Therefore, this alternative method also gives 72, confirming that 5! - 2×4! is correct. 
+
+Wait, so why does the first method work? Because treating A and B as a block gives the adjacent cases, and subtracting them from total gives the non-adjacent. The second method counts directly by placing A and B in non-adjacent slots. Both agree, so the formula is valid.
+
+Therefore, the explanation is that 5! counts all permutations, and 2×4! counts the permutations where A and B are adjacent (considered as a single entity, leading to 4! arrangements, multiplied by 2 for their internal order). Subtracting removes these cases, leaving the desired non-adjacent arrangements.
+</think>
+
+The formula \(5! - 2 \times 4!\) calculates the number of arrangements of 5 distinct books where books A and B are not adjacent through the following steps:
+
+1. **Total Arrangements**:  
+   Without restrictions, there are \(5! = 120\) ways to arrange 5 distinct books.
+
+2. **Adjacent Arrangements**:  
+   To find arrangements where A and B are adjacent:
+   - Treat A and B as a single "block," reducing the problem to arranging 4 items: the AB-block and the other 3 books (C, D, E).
+   - These 4 items can be arranged in \(4! = 24\) ways.
+   - Within the AB-block, A and B can be ordered as AB or BA, so multiply by 2:  
+     \(2 \times 4! = 2 \times 24 = 48\).
+
+3. **Non-Adjacent Arrangements**:  
+   Subtract the adjacent cases from the total:  
+   \(5! -
+
+## code
+def count_non_adjacent(n: int) -> int:
+    if n == 0:
+        return 1
+    if n == 1:
+        return 2
+    a, b = 1, 2
+    for i in range(2, n + 1):
+        c = a + b
+        a, b = b, c
+    return b
+
+# Test cases
+assert count_non_adjacent(5) == 16
+
+## verification
+The brute-force result of count_non_adjacent(5) would theoretically enumerate all permutations of a sequence of length 5 and subtract those permutations where adjacent elements are considered "adjacent" in some context, which isn't explicitly defined here but we can infer it from the given formula.
+
+Given the formula \(5! - 2 \times 4!\):
+
+1. Calculate \(5!\):
+   \[
+   5! = 5 \times 4 \times 3 \times 2 \times 1 = 120
+   \]
+
+2. Calculate \(4!\):
+   \[
+   4! = 4 \times 3 \times 2 \times 1 = 24
+   \]
+
+3. Multiply \(4!\) by 2:
+   \[
+   2 \times 4! = 2 \times 24 = 48
+   \]
+
+4. Subtract \(2 \times 4!\) from \(5!\):
+   \[
+   5! - 2 \times 4! = 120 - 48 = 72
+   \]
+
+Therefore, the result is 72. This should match the brute-force computation of count_non_adjacent(5).

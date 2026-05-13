@@ -1,0 +1,56 @@
+[
+  {
+    "task_id": "H-001",
+    "arm": "arm_A_single_qwq_cot",
+    "mean_latency_s": -1.0,
+    "stddev_latency_s": 0.0,
+    "mean_score": 0.6666666666666666,
+    "n_correct": 2,
+    "n_replicates": 3
+  },
+  {
+    "task_id": "H-001",
+    "arm": "arm_C_rlm_endpoint",
+    "mean_latency_s": -1.0,
+    "stddev_latency_s": 0.0,
+    "mean_score": 0.0,
+    "n_correct": 0,
+    "n_replicates": 3
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_A_single_qwq_cot",
+    "mean_latency_s": -1.0,
+    "stddev_latency_s": 0.0,
+    "mean_score": 1.0,
+    "n_correct": 3,
+    "n_replicates": 3
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_C_rlm_endpoint",
+    "mean_latency_s": 314.7730989456177,
+    "stddev_latency_s": 197.96026807790773,
+    "mean_score": 1.0,
+    "n_correct": 3,
+    "n_replicates": 3
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_A_single_qwq_cot",
+    "mean_latency_s": 158.1850388844808,
+    "stddev_latency_s": 2.3204411315360747,
+    "mean_score": 1.0,
+    "n_correct": 3,
+    "n_replicates": 3
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_C_rlm_endpoint",
+    "mean_latency_s": 421.8102819919586,
+    "stddev_latency_s": 22.181157919187243,
+    "mean_score": 1.0,
+    "n_correct": 3,
+    "n_replicates": 3
+  }
+]

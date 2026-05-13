@@ -1,0 +1,155 @@
+[
+  {
+    "task_id": "H-001",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 0,
+    "latency_s": -1.0,
+    "score": 1.0,
+    "content_chars": 7795,
+    "resumed": true
+  },
+  {
+    "task_id": "H-001",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 1,
+    "latency_s": -1.0,
+    "score": 1.0,
+    "content_chars": 6838,
+    "resumed": true
+  },
+  {
+    "task_id": "H-001",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 2,
+    "latency_s": -1.0,
+    "score": 0.0,
+    "content_chars": 8240,
+    "resumed": true
+  },
+  {
+    "task_id": "H-001",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 0,
+    "latency_s": -1.0,
+    "score": 0.0,
+    "content_chars": 5584,
+    "resumed": true
+  },
+  {
+    "task_id": "H-001",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 1,
+    "latency_s": -1.0,
+    "score": 0.0,
+    "content_chars": 12262,
+    "resumed": true
+  },
+  {
+    "task_id": "H-001",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 2,
+    "latency_s": -1.0,
+    "score": 0.0,
+    "content_chars": 4024,
+    "resumed": true
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 0,
+    "latency_s": -1.0,
+    "score": 1.0,
+    "content_chars": 7939,
+    "resumed": true
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 1,
+    "latency_s": -1.0,
+    "score": 1.0,
+    "content_chars": 7594,
+    "resumed": true
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 2,
+    "latency_s": -1.0,
+    "score": 1.0,
+    "content_chars": 7837,
+    "resumed": true
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 0,
+    "latency_s": 543.3554019927979,
+    "score": 1.0,
+    "content_chars": 25739
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 1,
+    "latency_s": 201.41242456436157,
+    "score": 1.0,
+    "content_chars": 8136
+  },
+  {
+    "task_id": "H-002",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 2,
+    "latency_s": 199.5514702796936,
+    "score": 1.0,
+    "content_chars": 8635
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 0,
+    "latency_s": 160.86375403404236,
+    "score": 1.0,
+    "content_chars": 6025
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 1,
+    "latency_s": 156.79266333580017,
+    "score": 1.0,
+    "content_chars": 6074
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_A_single_qwq_cot",
+    "replicate": 2,
+    "latency_s": 156.89869928359985,
+    "score": 1.0,
+    "content_chars": 5560
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 0,
+    "latency_s": 446.0363550186157,
+    "score": 1.0,
+    "content_chars": 22311
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 1,
+    "latency_s": 402.4981617927551,
+    "score": 1.0,
+    "content_chars": 18006
+  },
+  {
+    "task_id": "H-003",
+    "arm": "arm_C_rlm_endpoint",
+    "replicate": 2,
+    "latency_s": 416.896329164505,
+    "score": 1.0,
+    "content_chars": 13126
+  }
+]

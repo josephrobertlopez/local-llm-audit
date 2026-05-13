@@ -1,0 +1,91 @@
+# Hybrid tasks for measuring RLM vs single-backend on multi-step problems.
+# Designed where naive single-pass should fail and decompose-dispatch-aggregate
+# should help. Operator-driven measurement (not contract scope).
+
+tasks:
+  - id: H-001
+    name: meet_time_function_and_verify
+    description: |
+      Write a Python function meet_time(a_speed, b_speed, gap, delay) that
+      returns the meeting time as "HH:MM" given that train A starts at 9:00
+      heading east at a_speed mph, train B starts delay hours later at gap
+      miles east of A heading west at b_speed mph. Then call meet_time(60, 40,
+      200, 1) and report the resulting time.
+    expected_decomposition:
+      - prompt: Write the Python function meet_time(a_speed, b_speed, gap, delay) -> str
+        intent: code
+      - prompt: Call meet_time(60, 40, 200, 1) and report the result
+        intent: verification
+    success_check_regex: '\b11:24\b'
+
+  - id: H-002
+    name: book_perms_formula_and_brute_force
+    description: |
+      Explain why the formula 5! - 2*4! counts arrangements of 5 distinct
+      books where books A and B are NOT adjacent, AND write a Python function
+      count_non_adjacent(n) that brute-forces the count for n=5 distinct books.
+      Verify that the brute-force result matches the formula.
+    expected_decomposition:
+      - prompt: Explain the formula 5! - 2*4! for non-adjacent permutations
+        intent: reasoning_hard
+      - prompt: Write count_non_adjacent(n) brute-force, call with n=5
+        intent: code
+      - prompt: Verify formula result equals brute-force result
+        intent: verification
+    success_check_regex: '\b72\b'
+
+  - id: H-003
+    name: recurrence_explain_implement_verify_depth2
+    description: |
+      Given the recurrence f(n) = f(n-1) + 2*f(n-2) with f(1)=f(2)=1,
+      (a) explain the closed-form or growth rate,
+      (b) implement a Python function f(n) iteratively,
+      (c) verify that f(10) = 341,
+      (d) implement a helper that confirms f(n) grows roughly geometrically.
+      This task is designed to benefit from depth-2 recursion: the "explain
+      growth rate" subtask itself decomposes into (compute characteristic
+      polynomial, identify dominant root, estimate growth rate).
+    expected_decomposition:
+      - prompt: Explain the growth rate of f(n) = f(n-1) + 2*f(n-2)
+        intent: reasoning_hard
+        recurse: true   # this subtask should itself decompose at depth 2
+      - prompt: Implement f(n) iteratively in Python
+        intent: code
+      - prompt: Verify f(10) equals 341
+        intent: verification
+    success_check_regex: '\b341\b'
+
+  - id: H-004
+    name: multilevel_explicit_recursion
+    description: |
+      You will perform a multi-step task that REQUIRES recursive decomposition:
+
+      Top task: "Build a verified solution to the partition function p(n)."
+
+      This task has multiple distinct subtask types that each require different
+      reasoning skills. You SHOULD decompose recursively because:
+        - The mathematical analysis of p(n) is itself a multi-step problem
+          (closed-form does not exist, but a Hardy-Ramanujan asymptotic does)
+        - The implementation requires choosing between recursion + memoization
+          OR dynamic programming OR generating function methods
+        - Verification requires running the implementation for known values
+          AND comparing against a hand-computed value
+
+      Decompose this into subtasks. Mark the "mathematical analysis" subtask
+      with recurse=true because it itself decomposes into (asymptotic formula,
+      generating function approach, recursion identity). Mark the "implementation
+      design" subtask with recurse=true because it decomposes into (algorithm
+      choice, complexity analysis, code).
+
+      Then verify that p(5) = 7 (the partition function for 5: 5, 4+1, 3+2, 3+1+1,
+      2+2+1, 2+1+1+1, 1+1+1+1+1).
+    expected_decomposition:
+      - prompt: Analyze p(n) mathematically — asymptotic, generating function, recurrence
+        intent: reasoning_hard
+        recurse: true   # FORCED
+      - prompt: Design and implement a Python p(n) function
+        intent: code
+        recurse: true   # FORCED
+      - prompt: Verify p(5) equals 7
+        intent: verification
+    success_check_regex: '\bp\(5\)\s*=\s*7\b|\b7\b.*partition|\b7\s*$|partition.{0,20}7'

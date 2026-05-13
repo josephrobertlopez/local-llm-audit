@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.benchmarks/
+.env
+audit-results/
+rerun-results/
+*.egg-info/
+.coverage
+.tox/
