@@ -1,6 +1,5 @@
 from unittest.mock import patch, MagicMock
 
-import pytest
 import requests
 
 from silent_compound_failures.llm_adapter import (

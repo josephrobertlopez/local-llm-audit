@@ -89,3 +89,8 @@ class AuditResult(BaseModel):
     parsed_intents: Optional[list[str]] = None
     completion_tokens: Optional[int] = None
     finish_reason: Optional[str] = None
+    # rlm_trace_h001 fields (declared so mypy accepts kwargs; extras still allowed)
+    trace_n_subtasks: Optional[int] = None
+    trace_subtask_intents: Optional[list[str]] = None
+    trace_backends: Optional[list[str]] = None
+    h001_score_match: Optional[bool] = None

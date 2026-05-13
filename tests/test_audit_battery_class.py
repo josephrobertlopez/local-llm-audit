@@ -1,8 +1,5 @@
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
-
-import pytest
 
 from silent_compound_failures.audit_battery import (
     AuditBattery,

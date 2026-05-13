@@ -32,6 +32,22 @@ from silent_compound_failures.audit_battery import (  # noqa: E402
     parse_decomposition,
 )
 
+__all__ = [
+    "AuditBattery",
+    "DECOMPOSE_SYSTEM",
+    "DECOMPOSE_TEMPLATE",
+    "LLMResult",
+    "OpenAICompatAdapter",
+    "RLMHubAdapter",
+    "TaskSuite",
+    "call_llm",
+    "call_rlm",
+    "load_config",
+    "load_tasks",
+    "main",
+    "parse_decomposition",
+]
+
 
 def load_config():
     token = os.environ.get("RLM_TOKEN")
@@ -69,7 +85,7 @@ def call_rlm(prompt, timeout, token, hub_url):
     adapter = RLMHubAdapter(base_url=hub_url, token=token)
     content, latency, trace = adapter.rlm_decompose(prompt, timeout)
     if content is None:
-        print(f"[ERROR] RLM request failed", file=sys.stderr)
+        print("[ERROR] RLM request failed", file=sys.stderr)
     return content, latency, (trace or {})
 
 

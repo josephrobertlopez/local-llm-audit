@@ -20,7 +20,6 @@ from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 import yaml
-from statistics import mean as _mean
 
 from .llm_adapter import LLMAdapter, OpenAICompatAdapter, RLMHubAdapter
 from .schemas import AuditResult, TaskSuite
@@ -184,10 +183,10 @@ class AuditBattery:
                 )
                 content = r.content
                 if content:
-                    parsed, n_subtasks, intents = parse_decomposition(content)
+                    parsed, n_subtasks, _ = parse_decomposition(content)
                     parse_success = parsed is not None
                 else:
-                    n_subtasks, intents, parse_success = 0, [], False
+                    n_subtasks, parse_success = 0, False
                 out.append(
                     AuditResult(
                         test="qwq_1500_repro",
@@ -247,18 +246,26 @@ class AuditBattery:
         bug_confirmed = (t2_n >= 6) and (t1_rate - t2_rate >= 0.3)
         test2_breakdown: Literal["confirmed", "no-evidence"] = "confirmed" if bug_confirmed else "no-evidence"
 
-        t3_n_subtasks = [getattr(r, "trace_n_subtasks", 0) or r.model_dump().get("trace_n_subtasks", 0) for r in test3]
+        t3_n_subtasks = [r.model_dump().get("trace_n_subtasks", 0) for r in test3]
         t3_pass = bool(t3_n_subtasks) and max(t3_n_subtasks) > 1
         test3_breakdown: Literal["pass", "fail"] = "pass" if t3_pass else "fail"
 
-        # Statistical significance heuristic (real Fisher's exact wired in wave-5 stats module)
+        # Statistical significance heuristic (real Fisher's exact wired in wave-5 stats module).
+        # Logic:
+        #   N<12  → underpowered (never enough to conclude anything)
+        #   no real effect (|Δrate|<0.1) → null even at moderate N
+        #   effect present but N<30 → underpowered (need more samples for confident sig.)
+        #   else  → significant
         total_n = t1_n + t2_n
+        diff = abs(t1_rate - t2_rate)
         if total_n < 12:
             test4_breakdown: Literal["significant", "underpowered", "null"] = "underpowered"
-        elif abs(t1_rate - t2_rate) >= 0.4:
-            test4_breakdown = "significant"
-        else:
+        elif diff < 0.1:
             test4_breakdown = "null"
+        elif total_n < 30:
+            test4_breakdown = "underpowered"
+        else:
+            test4_breakdown = "significant"
 
         breakdown = VerdictBreakdown(
             test1_fix_reliability=test1_breakdown,
