@@ -1,4 +1,4 @@
-# silent-compound-failures
+# local-llm-audit
 
 **Gray-failure detection in agentic decomposition pipelines.**
 
@@ -80,15 +80,24 @@ All 9 RLM runs had verified per-call decomposition (`n_subtasks` ∈ {2, 3, 3, 3
   task shape; explicit-subtask-structure tasks (planning, multi-step agentic) might
   show different results
 
-## Reuse (apply to your own pipeline)
+## Quickstart
 
-1. Set `RLM_TOKEN` and `RLM_HUB_URL` env vars (see `.env.example`).
-2. Provide a tasks YAML — see `tasks_example.yaml` for format (id, description, success_check_regex).
-3. Run the audit battery:
-   ```bash
-   python audit_battery.py --tasks tasks_example.yaml --out-dir ./audit-results
-   ```
-4. Inspect `audit-results/raw.json` for per-call data, console output for summary.
+```bash
+git clone https://github.com/josephrobertlopez/local-llm-audit.git
+cd local-llm-audit
+pip install -r requirements.txt
+
+# Point at your hub
+export RLM_HUB_URL=http://your-hub:1337
+export RLM_TOKEN=your-token
+
+# Run the audit battery
+python audit_battery.py --tasks tasks_example.yaml --out-dir ./audit-results
+```
+
+Inspect `audit-results/raw.json` for per-call data, console output for summary verdict.
+
+To extend with different benchmarks: write a tasks YAML matching `tasks_example.yaml` format, point at any OpenAI-compatible endpoint with `/v1/rlm` support. Hardware-agnostic — user provides the endpoint.
 
 The battery assumes your decomposition endpoint exposes a `trace.n_subtasks` field
 (or equivalent) so Test 3 can verify real decomposition occurred. If your endpoint
