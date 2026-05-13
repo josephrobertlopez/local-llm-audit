@@ -5,12 +5,21 @@ import re
 import os
 import argparse
 from pathlib import Path
-from datetime import datetime
-from dataclasses import dataclass
-from typing import Optional
-import requests
-import yaml
 from statistics import mean, stdev
+
+import yaml
+
+# Ensure src/ is importable when the script is run from repo root.
+_REPO = Path(__file__).resolve().parent
+_SRC = _REPO / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+from silent_compound_failures.llm_adapter import (  # noqa: E402
+    LLMResult,
+    OpenAICompatAdapter,
+    RLMHubAdapter,
+)
 
 DECOMPOSE_SYSTEM = "You decompose a complex task into 2-4 simpler subtasks, each tagged with an intent category. Allowed intents: code, reasoning_hard, reasoning_fast, verification, synthesis. Output a YAML list with fields prompt (the subtask text) and intent (the category). Do not execute the subtasks; only decompose."
 
@@ -31,14 +40,6 @@ Example:
   intent: reasoning_fast
 """
 
-@dataclass
-class LLMResult:
-    content: Optional[str]
-    latency_s: float
-    completion_tokens: int
-    finish_reason: Optional[str]
-    http_status: Optional[int]
-    error: Optional[str]
 
 def load_config():
     token = os.environ.get("RLM_TOKEN")
@@ -47,12 +48,14 @@ def load_config():
     hub_url = os.environ.get("RLM_HUB_URL", "http://localhost:1337")
     return token, hub_url
 
+
 def load_tasks(yaml_path):
     with open(yaml_path) as f:
         tasks_data = yaml.safe_load(f)
     if isinstance(tasks_data, dict) and 'tasks' in tasks_data:
         tasks_data = tasks_data['tasks']
     return [t for t in tasks_data if t.get('id') in ['H-001', 'H-002', 'H-003']]
+
 
 def parse_decomposition(content):
     try:
@@ -65,55 +68,33 @@ def parse_decomposition(content):
             return parsed, len(parsed) if parsed else 0, []
         intents = [item.get('intent', 'unknown') for item in parsed if isinstance(item, dict)]
         return parsed, len(parsed), intents
-    except Exception as e:
+    except Exception:
         return None, 0, []
 
+
 def call_llm(model, messages, max_tokens, timeout, token, hub_url):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}"
-    }
-    payload = {
-        "model": model,
-        "messages": messages,
-        "max_tokens": max_tokens,
-        "temperature": 0.1
-    }
-    try:
-        start = datetime.now()
-        resp = requests.post(f"{hub_url}/v1/chat/completions", json=payload, headers=headers, timeout=timeout)
-        latency = (datetime.now() - start).total_seconds()
-        if resp.status_code != 200:
-            print(f"[ERROR] {model} returned {resp.status_code}", file=sys.stderr)
-            return LLMResult(None, latency, 0, None, resp.status_code, f"HTTP {resp.status_code}")
-        data = resp.json()
-        content = data['choices'][0]['message']['content']
-        completion_tokens = data.get('usage', {}).get('completion_tokens', 0)
-        finish_reason = data['choices'][0].get('finish_reason', 'unknown')
-        return LLMResult(content, latency, completion_tokens, finish_reason, 200, None)
-    except Exception as e:
-        print(f"[ERROR] {model} request failed: {e}", file=sys.stderr)
-        return LLMResult(None, 0, 0, None, None, str(e))
+    """Backwards-compatible thin wrapper around OpenAICompatAdapter.chat."""
+    adapter = OpenAICompatAdapter(base_url=hub_url, token=token)
+    result = adapter.chat(model, messages, max_tokens, timeout)
+    if result.error and result.http_status is None:
+        print(f"[ERROR] {model} request failed: {result.error}", file=sys.stderr)
+    elif result.http_status and result.http_status != 200:
+        print(f"[ERROR] {model} returned {result.http_status}", file=sys.stderr)
+    return result
+
 
 def call_rlm(prompt, timeout, token, hub_url):
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {token}"
-    }
-    payload = {"prompt": prompt}
-    try:
-        start = datetime.now()
-        resp = requests.post(f"{hub_url}/v1/rlm", json=payload, headers=headers, timeout=timeout)
-        latency = (datetime.now() - start).total_seconds()
-        if resp.status_code != 200:
-            return None, latency, {}
-        data = resp.json()
-        content = data.get('content', '')
-        trace = data.get('trace', {})
-        return content, latency, trace
-    except Exception as e:
-        print(f"[ERROR] RLM request failed: {e}", file=sys.stderr)
-        return None, 0, None
+    """Backwards-compatible thin wrapper around RLMHubAdapter.rlm_decompose.
+
+    Returns (content, latency, trace_dict_or_empty) to match prior signature.
+    """
+    adapter = RLMHubAdapter(base_url=hub_url, token=token)
+    content, latency, trace = adapter.rlm_decompose(prompt, timeout)
+    if content is None:
+        # preserve prior behavior of logging hub failures
+        print(f"[ERROR] RLM request failed", file=sys.stderr)
+    return content, latency, (trace or {})
+
 
 def main():
     parser = argparse.ArgumentParser(description="Audit LLM decomposition reliability")
@@ -285,6 +266,7 @@ def main():
         print(f"  real_decomposition: {real_decomp}")
 
     print("\n" + "=" * 70)
+
 
 if __name__ == "__main__":
     main()
