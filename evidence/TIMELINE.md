@@ -16,7 +16,7 @@ All times America/Chicago, 2026-05-12 unless otherwise noted.
 - 19:00 — iter-2 measurement run (duplicate-decompose fix), reduced latency 25-32%
 - 19:30 — joey: "use adversarial reductionism" → audit on own work
 - 19:35 — pink elephant identified: every trace file shows singleton-fallback fingerprint `## reasoning_fast` × 1 header
-- 19:40 — direct probe of `_kronos_call("qwq-32b-awq", decompose_prompt, max_tokens=1500)`: returns 0 chars on 3/3 tasks
+- 19:40 — direct probe of `_hub_call("qwq-32b-awq", decompose_prompt, max_tokens=1500)`: returns 0 chars on 3/3 tasks
   - Caveat: probe ran with auth env LLAMA_API_KEY="test" → 401, masked real failure mode
 - 19:50 — real cause identified: qwq emits prose+yaml; `_parse_decomposition` uses `yaml.safe_load` on whole string; parse fails 100% on prose+yaml
 - 20:00 — synthetic repro of parser failure (see evidence/bug-repro/parser_failure_synthetic.py)

@@ -4,9 +4,9 @@ The following measurement files were produced while the decomposer was silently 
 
 ```
 2026-05-12_rlm-hybrid/
-  arm_B_rlm_kronos__H-001.txt
-  arm_B_rlm_kronos__H-002.txt
-  arm_B_rlm_kronos__H-003.txt
+  arm_B_rlm_hub__H-001.txt
+  arm_B_rlm_hub__H-002.txt
+  arm_B_rlm_hub__H-003.txt
   depth2_trace__H-003.txt
   depth2_trace__H-004.txt
   free-results.json (arm_B portion)

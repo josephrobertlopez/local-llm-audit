@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
 import sys
 import json
-import time
 import re
 import os
 import argparse
 from pathlib import Path
 from statistics import mean, stdev
-import requests
+
 import yaml
+
+# Ensure src/ is importable when the script is run from repo root.
+_REPO = Path(__file__).resolve().parent
+_SRC = _REPO / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+from silent_compound_failures.llm_adapter import RLMHubAdapter  # noqa: E402
+from silent_compound_failures.schemas import RunResult, TaskAggregate, TaskSuite  # noqa: E402
+
 
 def load_config():
     token = os.environ.get("RLM_TOKEN")
@@ -16,6 +25,7 @@ def load_config():
         raise RuntimeError("Set RLM_TOKEN env var")
     hub_url = os.environ.get("RLM_HUB_URL", "http://localhost:1337")
     return token, hub_url
+
 
 def main():
     parser = argparse.ArgumentParser(description="Rerun RLM tasks and verify decomposition")
@@ -29,14 +39,16 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(args.tasks) as f:
-        tasks_data = yaml.safe_load(f)
-
-    tasks = {t["id"]: t for t in tasks_data.get("tasks", [])}
+        raw = yaml.safe_load(f)
+    suite = TaskSuite(**raw)
+    tasks = {t.id: t.model_dump() for t in suite.tasks}
     task_ids = args.task_ids.split(",")
     results = []
 
     REPS = 3
     TIMEOUT = 900
+
+    adapter = RLMHubAdapter(base_url=hub_url, token=token)
 
     for task_id in task_ids:
         if task_id not in tasks:
@@ -48,82 +60,53 @@ def main():
         success_regex = task.get("success_check_regex", "")
 
         for rep in range(REPS):
-            try:
-                start = time.time()
-                resp = requests.post(
-                    f"{hub_url}/v1/rlm",
-                    json={"prompt": description},
-                    headers={"Authorization": f"Bearer {token}"},
-                    timeout=TIMEOUT,
-                )
-                latency_s = time.time() - start
-                status = resp.status_code
-
-                if status != 200:
-                    print(f"[{task_id}] rep{rep}: HTTP {status}")
-                    results.append(
-                        {
-                            "task_id": task_id,
-                            "rep": rep,
-                            "latency_s": latency_s,
-                            "score": 0.0,
-                            "content_chars": 0,
-                            "trace_n_subtasks": 0,
-                            "trace_subtask_intents": [],
-                            "trace_backends": [],
-                            "real_decomposition": False,
-                            "http_status": status,
-                        }
-                    )
-                    continue
-
-                data = resp.json()
-                content = data.get("content", "")
-                trace = data.get("trace", {})
-                n_subtasks = trace.get("n_subtasks", 0)
-                subtask_intents = trace.get("subtask_intents", [])
-                backends = trace.get("backends", [])
-
-                score = 1.0 if success_regex and re.search(success_regex, content) else 0.0
-                real_decomp = n_subtasks > 1
-
-                (out_dir / f"arm_clean__{task_id}__rep{rep}.txt").write_text(content)
-
+            content, latency_s, trace = adapter.rlm_decompose(description, TIMEOUT)
+            if content is None:
+                print(f"[{task_id}] rep{rep}: hub call failed")
                 results.append(
-                    {
-                        "task_id": task_id,
-                        "rep": rep,
-                        "latency_s": latency_s,
-                        "score": score,
-                        "content_chars": len(content),
-                        "trace_n_subtasks": n_subtasks,
-                        "trace_subtask_intents": subtask_intents,
-                        "trace_backends": backends,
-                        "real_decomposition": real_decomp,
-                        "http_status": status,
-                    }
+                    RunResult(
+                        task_id=task_id,
+                        rep=rep,
+                        latency_s=latency_s,
+                        score=0.0,
+                        content_chars=0,
+                        trace_n_subtasks=0,
+                        trace_subtask_intents=[],
+                        trace_backends=[],
+                        real_decomposition=False,
+                        http_status=0,
+                    ).model_dump()
                 )
+                continue
 
-                print(
-                    f"[{task_id}] rep{rep}: subtasks={n_subtasks} real={real_decomp} score={score} latency={latency_s:.1f}s"
-                )
+            trace = trace or {}
+            n_subtasks = trace.get("n_subtasks", 0)
+            subtask_intents = trace.get("subtask_intents", [])
+            backends = trace.get("backends", [])
 
-            except Exception as e:
-                print(f"[{task_id}] rep{rep}: ERROR {e}")
-                results.append(
-                    {
-                        "task_id": task_id,
-                        "rep": rep,
-                        "latency_s": 0.0,
-                        "score": 0.0,
-                        "content_chars": 0,
-                        "trace_n_subtasks": 0,
-                        "trace_subtask_intents": [],
-                        "trace_backends": [],
-                        "real_decomposition": False,
-                        "http_status": 0,
-                    }
-                )
+            score = 1.0 if success_regex and re.search(success_regex, content) else 0.0
+            real_decomp = n_subtasks > 1
+
+            (out_dir / f"arm_clean__{task_id}__rep{rep}.txt").write_text(content)
+
+            results.append(
+                RunResult(
+                    task_id=task_id,
+                    rep=rep,
+                    latency_s=latency_s,
+                    score=score,
+                    content_chars=len(content),
+                    trace_n_subtasks=n_subtasks,
+                    trace_subtask_intents=subtask_intents,
+                    trace_backends=backends,
+                    real_decomposition=real_decomp,
+                    http_status=200,
+                ).model_dump()
+            )
+
+            print(
+                f"[{task_id}] rep{rep}: subtasks={n_subtasks} real={real_decomp} score={score} latency={latency_s:.1f}s"
+            )
 
     (out_dir / "raw.json").write_text(json.dumps(results, indent=2))
 
@@ -137,12 +120,12 @@ def main():
         n_correct = sum(1 for r in task_results if r["score"] == 1.0)
         latencies = [r["latency_s"] for r in task_results if r["http_status"] == 200]
 
-        agg[task_id] = {
-            "n_real_decomp": n_real,
-            "n_correct": n_correct,
-            "mean_latency_s": mean(latencies) if latencies else 0.0,
-            "stddev_latency_s": stdev(latencies) if len(latencies) > 1 else 0.0,
-        }
+        agg[task_id] = TaskAggregate(
+            n_real_decomp=n_real,
+            n_correct=n_correct,
+            mean_latency_s=mean(latencies) if latencies else 0.0,
+            stddev_latency_s=stdev(latencies) if len(latencies) > 1 else 0.0,
+        ).model_dump()
 
     (out_dir / "aggregate.json").write_text(json.dumps(agg, indent=2))
 
@@ -157,6 +140,7 @@ def main():
         print(
             f"{task_id:6} | {a['n_real_decomp']:7}/3 | {a['n_correct']:11}/3 | {a['mean_latency_s']:11.2f} | {a['stddev_latency_s']:6.2f}"
         )
+
 
 if __name__ == "__main__":
     main()

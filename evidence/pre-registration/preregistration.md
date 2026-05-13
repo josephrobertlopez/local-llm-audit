@@ -14,7 +14,7 @@ The in-process Arm-B baseline (measurement 2026-05-12_rlm-hybrid/free-results.js
 - HTTP layer: status, response body, headers, latency
 
 ## Transition mechanism
-POST /v1/rlm {prompt} -> router.classify -> controller.run(decomposer=llm_decomposer, specialist_call=kronos_only) -> in-process specialist calls (via existing cache.acquire/release) -> aggregator -> JSON response.
+POST /v1/rlm {prompt} -> router.classify -> controller.run(decomposer=llm_decomposer, specialist_call=hub_only) -> in-process specialist calls (via existing cache.acquire/release) -> aggregator -> JSON response.
 
 NOTE: orchestrator calls back into the same hub via httpx for specialist dispatch. This is intentional and matches Arm-B baseline behavior. No new external dependencies.
 
@@ -22,7 +22,7 @@ NOTE: orchestrator calls back into the same hub via httpx for specialist dispatc
 - correctness: Q-scorer regex match per tasks_rlm.yaml success_check_regex
 - end-to-end latency: HTTP request to response (ms)
 - trace fidelity: same subtask count + same specialist routes as in-process baseline
-- token count: sum of all specialist call tokens (from kronos hub responses)
+- token count: sum of all specialist call tokens (from local hub responses)
 
 ## Pre-registered outcomes (matched pair vs in-process baseline on H-001/H-002/H-003)
 
@@ -43,7 +43,7 @@ N=3 tasks (H-001/H-002/H-003), matched-pair with the Arm-B baseline. Same N as t
 - Total wall-clock >10 min -> dispatch timeout, partial results discarded
 
 ## Instrument
-- /v1/rlm route in hub.py (~25 LOC), wraps existing orchestrator.run with kronos-only specialist binding
+- /v1/rlm route in hub.py (~25 LOC), wraps existing orchestrator.run with hub-only specialist binding
 - Harness script (~50 LOC): dispatches H-001/H-002/H-003 via HTTP AND via direct in-process import, compares
 - Existing Q-scorer (src/benchmark/quality/scorer.py) applied unchanged
 
