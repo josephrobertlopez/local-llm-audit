@@ -16,6 +16,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from silent_compound_failures.llm_adapter import RLMHubAdapter  # noqa: E402
+from silent_compound_failures.schemas import RunResult, TaskAggregate, TaskSuite  # noqa: E402
 
 
 def load_config():
@@ -38,9 +39,9 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with open(args.tasks) as f:
-        tasks_data = yaml.safe_load(f)
-
-    tasks = {t["id"]: t for t in tasks_data.get("tasks", [])}
+        raw = yaml.safe_load(f)
+    suite = TaskSuite(**raw)
+    tasks = {t.id: t.model_dump() for t in suite.tasks}
     task_ids = args.task_ids.split(",")
     results = []
 
@@ -63,18 +64,18 @@ def main():
             if content is None:
                 print(f"[{task_id}] rep{rep}: hub call failed")
                 results.append(
-                    {
-                        "task_id": task_id,
-                        "rep": rep,
-                        "latency_s": latency_s,
-                        "score": 0.0,
-                        "content_chars": 0,
-                        "trace_n_subtasks": 0,
-                        "trace_subtask_intents": [],
-                        "trace_backends": [],
-                        "real_decomposition": False,
-                        "http_status": 0,
-                    }
+                    RunResult(
+                        task_id=task_id,
+                        rep=rep,
+                        latency_s=latency_s,
+                        score=0.0,
+                        content_chars=0,
+                        trace_n_subtasks=0,
+                        trace_subtask_intents=[],
+                        trace_backends=[],
+                        real_decomposition=False,
+                        http_status=0,
+                    ).model_dump()
                 )
                 continue
 
@@ -89,18 +90,18 @@ def main():
             (out_dir / f"arm_clean__{task_id}__rep{rep}.txt").write_text(content)
 
             results.append(
-                {
-                    "task_id": task_id,
-                    "rep": rep,
-                    "latency_s": latency_s,
-                    "score": score,
-                    "content_chars": len(content),
-                    "trace_n_subtasks": n_subtasks,
-                    "trace_subtask_intents": subtask_intents,
-                    "trace_backends": backends,
-                    "real_decomposition": real_decomp,
-                    "http_status": 200,
-                }
+                RunResult(
+                    task_id=task_id,
+                    rep=rep,
+                    latency_s=latency_s,
+                    score=score,
+                    content_chars=len(content),
+                    trace_n_subtasks=n_subtasks,
+                    trace_subtask_intents=subtask_intents,
+                    trace_backends=backends,
+                    real_decomposition=real_decomp,
+                    http_status=200,
+                ).model_dump()
             )
 
             print(
@@ -119,12 +120,12 @@ def main():
         n_correct = sum(1 for r in task_results if r["score"] == 1.0)
         latencies = [r["latency_s"] for r in task_results if r["http_status"] == 200]
 
-        agg[task_id] = {
-            "n_real_decomp": n_real,
-            "n_correct": n_correct,
-            "mean_latency_s": mean(latencies) if latencies else 0.0,
-            "stddev_latency_s": stdev(latencies) if len(latencies) > 1 else 0.0,
-        }
+        agg[task_id] = TaskAggregate(
+            n_real_decomp=n_real,
+            n_correct=n_correct,
+            mean_latency_s=mean(latencies) if latencies else 0.0,
+            stddev_latency_s=stdev(latencies) if len(latencies) > 1 else 0.0,
+        ).model_dump()
 
     (out_dir / "aggregate.json").write_text(json.dumps(agg, indent=2))
 

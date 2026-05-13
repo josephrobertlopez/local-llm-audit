@@ -20,6 +20,7 @@ from silent_compound_failures.llm_adapter import (  # noqa: E402
     OpenAICompatAdapter,
     RLMHubAdapter,
 )
+from silent_compound_failures.schemas import TaskSuite  # noqa: E402
 
 DECOMPOSE_SYSTEM = "You decompose a complex task into 2-4 simpler subtasks, each tagged with an intent category. Allowed intents: code, reasoning_hard, reasoning_fast, verification, synthesis. Output a YAML list with fields prompt (the subtask text) and intent (the category). Do not execute the subtasks; only decompose."
 
@@ -50,11 +51,17 @@ def load_config():
 
 
 def load_tasks(yaml_path):
+    """Load + validate via TaskSuite, filter to historic-bug task IDs, return as dicts.
+
+    Returning dicts preserves the existing call-site shape (task['id'], task['description']).
+    """
     with open(yaml_path) as f:
-        tasks_data = yaml.safe_load(f)
-    if isinstance(tasks_data, dict) and 'tasks' in tasks_data:
-        tasks_data = tasks_data['tasks']
-    return [t for t in tasks_data if t.get('id') in ['H-001', 'H-002', 'H-003']]
+        raw = yaml.safe_load(f)
+    if isinstance(raw, list):
+        raw = {"tasks": raw}
+    suite = TaskSuite(**raw)
+    keep = {"H-001", "H-002", "H-003"}
+    return [t.model_dump() for t in suite.tasks if t.id in keep]
 
 
 def parse_decomposition(content):
