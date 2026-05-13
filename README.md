@@ -119,6 +119,48 @@ malformed YAML, non-list YAML, intent extraction, edge cases.
 A long-form methodology note with full audit-battery design rationale, evidence logs,
 and the meta-insight about Test 2 / Test 3 is in `methodology.md`.
 
+## Cost expectations
+
+A full audit run is 21 LLM calls (9 for Test 1 + 9 for Test 2 + 3 for Test 3) at default
+`reps=3`. Rough $-per-audit on common models, using the rate card in
+`silent_compound_failures.cost.RATE_CARD_DEFAULT` (current as of **2026-05** — bump when
+provider pricing changes):
+
+| Endpoint | Cost per audit (approx) | Notes |
+|----------|-------------------------|-------|
+| Local Ollama (qwen2.5-coder:14b) | $0.00 | GPU electricity only |
+| Anthropic Haiku 4.5 | ~$0.05–0.15 | depends on task length |
+| Anthropic Sonnet 4.6 | ~$0.20–0.60 | |
+| Anthropic Opus 4.7 | ~$1.00–3.00 | |
+| OpenAI gpt-4o | ~$0.30–0.80 | |
+
+Use `CostTracker` to enforce a per-run budget:
+
+```python
+from silent_compound_failures.audit_battery import AuditBattery
+from silent_compound_failures.cost import CostTracker
+
+tracker = CostTracker(budget_usd=2.00)
+verdict = AuditBattery(
+    target_endpoint="https://api.anthropic.com",
+    target_token=os.environ["ANTHROPIC_API_KEY"],
+    tasks_path="tasks_example.yaml",
+    cost_tracker=tracker,
+).run()
+print(f"Spent ${tracker.total_spent():.4f} of ${tracker.budget_usd}")
+```
+
+The battery halts before exceeding the budget — the verdict may be marked
+`needs-more-data` if fewer than the required samples were collected.
+
+## Audits in the wild
+
+The `audits/` directory holds community-submitted audit results from teams who ran
+this battery against their own decomposition pipelines. To submit your own, see
+[CONTRIBUTING.md](CONTRIBUTING.md). We accept audits framed in the verdict's
+vocabulary (pass / fail / confirmed / no-evidence); we do **not** accept
+leaderboard-style claims against named external systems.
+
 ## License
 
 MIT. See `LICENSE`.

@@ -21,8 +21,10 @@ from typing import Literal, Optional
 
 import yaml
 
+from .cost import CostTracker
 from .llm_adapter import LLMAdapter, OpenAICompatAdapter, RLMHubAdapter
 from .schemas import AuditResult, TaskSuite
+from .stats import fisher_exact_aggregate
 
 DECOMPOSE_SYSTEM = (
     "You decompose a complex task into 2-4 simpler subtasks, each tagged with an intent "
@@ -117,6 +119,7 @@ class AuditBattery:
         adapter: Optional[LLMAdapter] = None,
         rlm_adapter: Optional[LLMAdapter] = None,
         target_task_ids: tuple[str, ...] = DEFAULT_TARGET_TASK_IDS,
+        cost_tracker: Optional[CostTracker] = None,
     ):
         self.target_endpoint = target_endpoint
         self.target_token = target_token
@@ -125,6 +128,7 @@ class AuditBattery:
         self.adapter: LLMAdapter = adapter or OpenAICompatAdapter(base_url=target_endpoint, token=target_token)
         self.rlm_adapter: LLMAdapter = rlm_adapter or RLMHubAdapter(base_url=target_endpoint, token=target_token)
         self.target_task_ids = target_task_ids
+        self.cost_tracker = cost_tracker
 
     def _load_tasks(self) -> list[dict]:
         with open(self.tasks_path) as f:
@@ -141,16 +145,26 @@ class AuditBattery:
             {"role": "user", "content": DECOMPOSE_TEMPLATE.format(task=description)},
         ]
 
+    def _record_cost(self, model: str, prompt_tokens: int, completion_tokens: int) -> None:
+        if self.cost_tracker is not None:
+            self.cost_tracker.record(model, prompt_tokens, completion_tokens)
+
+    def _budget_exceeded(self) -> bool:
+        return self.cost_tracker is not None and self.cost_tracker.should_halt()
+
     def _test1_fix_reliability(self, tasks: list[dict]) -> list[AuditResult]:
         out: list[AuditResult] = []
         for task in tasks:
             for rep in range(self.reps):
+                if self._budget_exceeded():
+                    return out
                 r = self.adapter.chat(
                     TEST1_MODEL,
                     self._decompose_messages(task["description"]),
                     TEST1_MAX_TOKENS,
                     TEST1_TIMEOUT,
                 )
+                self._record_cost(TEST1_MODEL, prompt_tokens=0, completion_tokens=r.completion_tokens or 0)
                 content = r.content
                 if content:
                     parsed, n_subtasks, intents = parse_decomposition(content)
@@ -175,12 +189,15 @@ class AuditBattery:
         out: list[AuditResult] = []
         for task in tasks:
             for rep in range(self.reps):
+                if self._budget_exceeded():
+                    return out
                 r = self.adapter.chat(
                     TEST2_MODEL,
                     self._decompose_messages(task["description"]),
                     TEST2_MAX_TOKENS,
                     TEST2_TIMEOUT,
                 )
+                self._record_cost(TEST2_MODEL, prompt_tokens=0, completion_tokens=r.completion_tokens or 0)
                 content = r.content
                 if content:
                     parsed, n_subtasks, _ = parse_decomposition(content)
@@ -273,7 +290,14 @@ class AuditBattery:
             test3_trace_verification=test3_breakdown,
             test4_statistical_significance=test4_breakdown,
         )
-        return None, breakdown  # fisher_p computed in wave-5 stats module
+        # Real Fisher's exact p-value (scipy) for the t1-vs-t2 success counts.
+        try:
+            fisher = fisher_exact_aggregate(t1_success, t1_n, t2_success, t2_n)
+            fisher_p: Optional[float] = fisher.p_value
+        except Exception:
+            fisher_p = None
+
+        return fisher_p, breakdown
 
     def _per_task_counts(self, results: list[AuditResult]) -> dict[str, int]:
         counts: dict[str, int] = {}

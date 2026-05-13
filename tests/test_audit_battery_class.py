@@ -7,6 +7,7 @@ from silent_compound_failures.audit_battery import (
     VerdictBreakdown,
     _classify,
 )
+from silent_compound_failures.cost import CostTracker
 from silent_compound_failures.llm_adapter import LLMResult
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -133,6 +134,39 @@ def test_audit_verdict_needs_more_data_when_underpowered():
     verdict = b.run()
     assert verdict.breakdown.test4_statistical_significance == "underpowered"
     assert verdict.overall == "needs-more-data"
+
+
+def test_audit_battery_fisher_p_populated_when_bug_present():
+    chat = _ChatScript([_ok()] * 9 + [_empty()] * 9)
+    rlm = _RLMScript([_trace_ok()] * 3)
+    adapter = _MockAdapter(chat, rlm)
+    b = AuditBattery(target_endpoint="x", target_token="y", tasks_path=str(TASKS_YAML), reps=3, adapter=adapter, rlm_adapter=adapter)
+    verdict = b.run()
+    assert verdict.fisher_p is not None
+    assert verdict.fisher_p < 0.001  # 9/9 vs 0/9 is extremely significant
+
+
+def test_audit_battery_halts_on_cost_tracker_budget():
+    chat = _ChatScript([_ok(tokens=10_000_000)] * 18)  # huge token count
+    rlm = _RLMScript([_trace_ok()] * 3)
+    adapter = _MockAdapter(chat, rlm)
+    tracker = CostTracker(budget_usd=0.01)
+    # Use a model in the rate card so cost is non-zero
+    # Patch TEST1_MODEL via subclass? Simpler: directly set tracker with a custom rate card
+    tracker.rate_card["qwen2.5-32b-instruct-awq"] = {"prompt": 0.0, "completion": 0.001}
+    b = AuditBattery(
+        target_endpoint="x",
+        target_token="y",
+        tasks_path=str(TASKS_YAML),
+        reps=3,
+        adapter=adapter,
+        rlm_adapter=adapter,
+        cost_tracker=tracker,
+    )
+    verdict = b.run()
+    # First call already exceeds budget; battery should halt almost immediately.
+    assert tracker.should_halt() is True
+    assert len(verdict.raw_results) < 21  # halt before full run
 
 
 def test_classify_helper_direct():
