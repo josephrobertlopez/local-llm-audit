@@ -12,10 +12,10 @@
       "verification"
     ],
     "trace_backends": [
-      "kronos-qwen-32b",
+      "hub-qwen-32b",
       "claude-haiku",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -33,9 +33,9 @@
       "code"
     ],
     "trace_backends": [
-      "kronos-qwen-32b",
+      "hub-qwen-32b",
       "claude-haiku",
-      "kronos-qwen-32b"
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -52,15 +52,15 @@
       "code"
     ],
     "trace_backends": [
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -78,9 +78,9 @@
       "verification"
     ],
     "trace_backends": [
-      "kronos-qwq-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwq-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -98,9 +98,9 @@
       "verification"
     ],
     "trace_backends": [
-      "kronos-qwq-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwq-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -121,12 +121,12 @@
     "trace_backends": [
       "claude-haiku",
       "claude-haiku",
-      "kronos-qwq-32b",
+      "hub-qwq-32b",
       "claude-haiku",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -145,11 +145,11 @@
     ],
     "trace_backends": [
       "claude-haiku",
-      "kronos-qwq-32b",
-      "kronos-qwq-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwq-32b",
+      "hub-qwq-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -168,11 +168,11 @@
     ],
     "trace_backends": [
       "claude-haiku",
-      "kronos-qwq-32b",
-      "kronos-qwq-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwq-32b",
+      "hub-qwq-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200
@@ -191,11 +191,11 @@
     ],
     "trace_backends": [
       "claude-haiku",
-      "kronos-qwq-32b",
+      "hub-qwq-32b",
       "claude-haiku",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "real_decomposition": true,
     "http_status": 200

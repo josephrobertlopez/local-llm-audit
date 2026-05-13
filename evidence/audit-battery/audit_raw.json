@@ -235,10 +235,10 @@
     "trace_n_subtasks": 3,
     "trace_subtask_intents": [],
     "trace_backends": [
-      "kronos-qwen-32b",
+      "hub-qwen-32b",
       "claude-haiku",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "h001_score_match": false
   },
@@ -250,13 +250,13 @@
     "trace_n_subtasks": 4,
     "trace_subtask_intents": [],
     "trace_backends": [
-      "kronos-qwen-32b",
+      "hub-qwen-32b",
       "claude-haiku",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "h001_score_match": false
   },
@@ -268,12 +268,12 @@
     "trace_n_subtasks": 3,
     "trace_subtask_intents": [],
     "trace_backends": [
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b",
-      "kronos-qwen-32b"
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b",
+      "hub-qwen-32b"
     ],
     "h001_score_match": false
   }
