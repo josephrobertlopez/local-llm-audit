@@ -185,7 +185,8 @@ def main():
 
     if hub_alive:
         print(f"  hub status: ALIVE at {args.hub_url}")
-        rlm_adapter = RLMHubAdapter(base_url=args.hub_url, token=args.hub_token)
+        hub_token = token if args.hub_token == "test" else args.hub_token
+        rlm_adapter = RLMHubAdapter(base_url=args.hub_url, token=hub_token)
     else:
         print(f"  hub status: NOT RUNNING — test3 will show trace=None (expected)")
         rlm_adapter = OpenRouterAdapter(token=token)
