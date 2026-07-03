@@ -5,6 +5,7 @@ __pycache__/
 .env
 audit-results/
 rerun-results/
+audit-openrouter/
 *.egg-info/
 .coverage
 .tox/

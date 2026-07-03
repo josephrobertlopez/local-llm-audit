@@ -15,6 +15,7 @@ CLI behavior preserved by the root `audit_battery.py` script.
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass, field
 from typing import Literal, Optional
@@ -51,10 +52,10 @@ Example:
 """
 
 DEFAULT_TARGET_TASK_IDS = ("H-001", "H-002", "H-003")
-TEST1_MODEL = "qwen2.5-32b-instruct-awq"
+TEST1_MODEL = os.environ.get("AUDIT_TEST1_MODEL", "qwen2.5-32b-instruct-awq")
 TEST1_MAX_TOKENS = 2000
 TEST1_TIMEOUT = 120
-TEST2_MODEL = "qwq-32b-awq"
+TEST2_MODEL = os.environ.get("AUDIT_TEST2_MODEL", "qwq-32b-awq")
 TEST2_MAX_TOKENS = 1500
 TEST2_TIMEOUT = 300
 TEST3_TIMEOUT = 900
