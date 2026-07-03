@@ -24,9 +24,9 @@ from pathlib import Path
 from statistics import mean, stdev
 
 # Set OpenRouter model IDs BEFORE importing audit_battery so module-level constants resolve correctly.
-os.environ.setdefault("AUDIT_TEST1_MODEL", "qwen/qwen-2.5-72b-instruct")
+os.environ.setdefault("AUDIT_TEST1_MODEL", "qwen/qwen-plus-2025-07-28")
 os.environ.setdefault("AUDIT_TEST2_MODEL", "qwen/qwen3-32b")
-os.environ.setdefault("RLM_MODEL", "qwen/qwen-2.5-72b-instruct")
+os.environ.setdefault("RLM_MODEL", "qwen/qwen-plus-2025-07-28")
 
 _REPO = Path(__file__).resolve().parent
 _SRC = _REPO / "src"
